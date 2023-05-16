@@ -20,6 +20,27 @@ BinarySearchTree.prototype.size = function(){
   return this.depthFirstForEach().length
 }
 
+/* //Corregido por Gama
+BinarySearchTree.prototype.size = function(){
+   //Caso A (2 ramificaciones)
+   if(this.right !== null && this.left !== null){
+      return 1 + this.left.size() + this.right.size()
+   }
+
+   //Caso B (1 ramificacion)
+   if(this.right === null && this.left !== null){
+      return 1 + this.left.size() //Recursion en la rama que está ocupada
+   }
+   if(this.right !== null && this.left === null){
+      return 1 + this.right.size() //Recursion en la rama que está ocupada
+   }
+
+   //Caso C (0 ramificaciones)
+   if(this.right === null && this.left === null){
+      return 1
+   }
+} */
+
 BinarySearchTree.prototype.insert = function(value){
    let leftNode = this.left
    let rightNode = this.right
@@ -40,6 +61,63 @@ BinarySearchTree.prototype.insert = function(value){
    }
 }
 
+/* //Corregido por Gama
+BinarySearchTree.prototype.insert = function(value){
+   //Agregar a la derecha
+   if(value >= this.value){
+      if(this.right === null){
+         this.right = new BinarySearchTree(value);
+      }else{//Si no está vacío me paro en el siguiente nodo y ejecuto el metodo insert (recursion)
+         this.right.insert(value)
+      }
+   }
+
+   //Agregar a la izquierda
+   if(value < this.value){
+      if(this.left === null){
+         this.left = new BinarySearchTree(value)
+      }else{
+         this.left.insert(value)
+      }
+   }
+} */
+
+BinarySearchTree.prototype.contains = function(value){
+   let arr = this.depthFirstForEach()
+   if(arr.includes(value)){
+      return true
+   }else{
+      return false
+   }
+}
+
+//Corregido por Gama
+/* BinarySearchTree.prototype.contains = function(value){
+   
+   //Si lo encuentro
+   if(this.value === value){
+      return true
+   }
+
+   //Si no lo encuentro y es mayor
+   if(value > this.value){
+      if(this.right === null){
+         return false
+      }else{//Vuelvo a ejecutar en la derecha
+         return this.right.contains(value)
+      }
+   }
+   
+   //Si no lo encuentro y es menor
+   if(value < this.value){
+      if(this.left === null){
+         return false
+      }else{//Vuelvo a ejecutar en la rama izquierda
+         return this.left.contains(value)
+      }
+   }
+} */
+
 BinarySearchTree.prototype.depthFirstForEach = function(order){
    let arr = []
    function inOrder (root){
@@ -52,7 +130,7 @@ BinarySearchTree.prototype.depthFirstForEach = function(order){
       }
       recorrer(root)
    }
-
+   
    function postOrder (root){
       let recorrer = function(node){
          if(node){
@@ -63,7 +141,7 @@ BinarySearchTree.prototype.depthFirstForEach = function(order){
       }
       recorrer(root)
    }
-
+   
    function preOrder (root){
       let recorrer = function(node){
          if(node){
@@ -74,7 +152,7 @@ BinarySearchTree.prototype.depthFirstForEach = function(order){
       }
       recorrer(root)
    }
-
+   
    if(order === "post-order"){
       postOrder(this)
       return arr
@@ -87,14 +165,34 @@ BinarySearchTree.prototype.depthFirstForEach = function(order){
    }
 }
 
-BinarySearchTree.prototype.contains = function(value){
-   let arr = this.depthFirstForEach()
-   if(arr.includes(value)){
-      return true
-   }else{
-      return false
+/* //Corregido por Gama
+BinarySearchTree.prototype.depthFirstForEach = function(cb, order){
+   
+   //root -> izq -> der
+   if(order === "pre-order"){
+      cb(this.value)
+      this.left && this.left.depthFirstForEach(cb,order)
+      this.right && this.right.depthFirstForEach(cb,order)
    }
-}
+
+   //izq -> der -> root
+   if(order === "post-order"){
+      this.left && this.left.depthFirstForEach(cb,order)
+      this.right && this.right.depthFirstForEach(cb,order)
+      cb(this.value)
+   }
+
+   //izq -> root -> der
+   else{//Si es inorder o cualquier otra cosa por defecto ejecuta inorder
+      if(this.left !== null){
+         this.left.depthFirstForEach(cb,order)
+      }
+      cb(this.value)
+      if(this.right !== null){
+         this.right.depthFirstForEach(cb,order)
+      }
+   }
+} */
 
 BinarySearchTree.prototype.breadthFirstForEach = function(){
    let arr = []
@@ -113,6 +211,20 @@ BinarySearchTree.prototype.breadthFirstForEach = function(){
    recorrer(this);
    return arr
 }
+
+/* //Corregido por Gama
+BinarySearchTree.prototype.breadthFirstForEach = function(cb,almacen=[]){
+   cb(this.value)
+   if(this.left !== null){//Guardo el nodo en mi array (izquierdo primero)
+      almacen.push(this.left)
+   }
+   if(this.right !== null){//Guardo el nodo en mi array (derecho despues)
+      almacen.push(this.right)
+   }
+   if(almacen.length > 0){//Si hay nodos en mi almacen, elimino el primero y ejecuto la recursion en ese primer valor
+      almacen.shift().breadthFirstForEach(cb,almacen)
+   }
+} */
 
 
 let arbol = new BinarySearchTree(20)
